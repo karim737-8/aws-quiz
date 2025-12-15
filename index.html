@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Certified Data Engineer - Associate Exam</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-hover: #4338ca;
+      --bg-color: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --border-color: #E2E8F0;
+      --success: #10B981;
+      --error: #EF4444;
+      --choice-hover: #F1F5F9;
+      --radius: 12px;
+    }
+
+    /* Reset & Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    /* Layout */
+    .container {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 2rem;
+    }
+
+    /* Header */
+    header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand span {
+      color: var(--primary);
+    }
+
+    .stats {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .stat-item svg {
+      width: 18px;
+      height: 18px;
+      color: var(--primary);
+    }
+
+    /* Main Card */
+    .quiz-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Setup UI specific */
+    .setup-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .setup-card {
+      background: #F8FAFC;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .setup-card:hover {
+      border-color: var(--primary);
+      background: rgba(79, 70, 229, 0.1);
+    }
+
+    .setup-card.selected {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .setup-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .setup-card p {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .setup-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: center;
+      margin-top: 1rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    input[type="number"] {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.5rem;
+      border-radius: 6px;
+      width: 100px;
+      text-align: center;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-group input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+    }
+
+
+    /* Progress Bar */
+    .progress-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--border-color);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Question */
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .question-text {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      white-space: pre-wrap;
+      /* Preserve spacing */
+    }
+
+    /* Options */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      padding: 1rem;
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option:hover:not(.disabled) {
+      background: var(--choice-hover);
+      border-color: var(--primary);
+    }
+
+    .option.selected {
+      background: rgba(79, 70, 229, 0.15);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    .option.correct {
+      background: rgba(16, 185, 129, 0.15) !important;
+      border-color: var(--success) !important;
+    }
+
+    .option.wrong {
+      background: rgba(239, 68, 68, 0.15) !important;
+      border-color: var(--error) !important;
+    }
+
+    .badge-multiple {
+      display: inline-block;
+      background: rgba(79, 70, 229, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-left: 10px;
+      color: var(--primary);
+      border: 1px solid rgba(79, 70, 229, 0.3);
+    }
+
+    /* Actions */
+    .actions {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-primary:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-main);
+      color: var(--text-main);
+    }
+
+    /* Results */
+    .result-container {
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    .score-circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 8px solid var(--border-color);
+      margin: 0 auto 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      position: relative;
+    }
+
+    .report-list {
+      margin-top: 2rem;
+      text-align: left;
+    }
+
+    .report-item {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.9rem;
+    }
+
+    .report-item.correct span {
+      color: var(--success);
+    }
+
+    .report-item.wrong span {
+      color: var(--error);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Loading */
+    .loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container fade-in">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+          style="width:24px;height:24px;color:var(--primary);">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M16.712 4.33a9.027 9.027 0 011.652 1.306c.51.51.944 1.064 1.306 1.652M16.712 4.33l-3.448 4.138m3.448-4.138a9.014 9.014 0 00-9.424 0M19.67 7.288l-4.138 3.448m4.138-3.448a9.014 9.014 0 010 9.424m-4.33 1.652a9.027 9.027 0 01-1.652-1.306c-.51-.51-.944-1.064-1.306-1.652m0 0l3.448-4.138m-3.448 4.138a9.014 9.014 0 009.424 0m-6.406-3.082l4.138-3.448m-4.138 3.448a9.014 9.014 0 01-9.424 0m4.33-1.652a9.027 9.027 0 011.652 1.306c.51.51.944 1.064 1.306 1.652" />
+        </svg>
+        <span>AWS</span>DataEngineer
+      </div>
+      <div class="stats">
+        <div class="stat-item" title="Progress">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+          </svg>
+          <span id="progress-text">0/0</span>
+        </div>
+        <div class="stat-item" title="Score">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+          </svg>
+          <span id="score-text">0%</span>
+        </div>
+        <div class="stat-item" title="Timer">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span id="timer-text">00:00</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- App Content -->
+    <div id="app">
+      <!-- Loading State -->
+      <div id="loading" class="loader">
+        Loading questions...
+      </div>
+
+      <!-- Setup Screen -->
+      <div id="setup-ui" class="quiz-card hidden">
+        <h2 style="margin-bottom:0.5rem;">Configure Exam</h2>
+        <p style="color:var(--text-muted); margin-bottom:2rem;">Select question count or enter a custom amount.</p>
+
+        <div class="setup-grid">
+          <div class="setup-card" onclick="selectCount(10)">
+            <h3>10</h3>
+            <p>Questions</p>
+          </div>
+          <div class="setup-card" onclick="selectCount(25)">
+            <h3>25</h3>
+            <p>Questions</p>
+          </div>
+          <div class="setup-card" onclick="selectCount(50)">
+            <h3>50</h3>
+            <p>Questions</p>
+          </div>
+          <div class="setup-card" onclick="selectCount('all')">
+            <h3>All</h3>
+            <p>Full Exam</p>
+          </div>
+        </div>
+
+        <div class="setup-options">
+          <div class="input-group">
+            <label for="custom-input">Or Custom Amount:</label>
+            <input type="number" id="custom-input" min="1" placeholder="#" oninput="handleCustomInput(this.value)">
+          </div>
+
+          <label class="checkbox-group">
+            <input type="checkbox" id="random-check">
+            <span>Randomize Question Order</span>
+          </label>
+
+          <button id="start-btn" class="btn-primary" disabled onclick="startExam()" style="margin-top:1rem;">Start
+            Exam</button>
+        </div>
+      </div>
+
+      <!-- Quiz Interface -->
+      <div id="quiz-ui" class="quiz-card hidden">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-bar"></div>
+        </div>
+
+        <div class="question-header">
+          <span>Question <span id="q-current"></span> of <span id="q-total"></span></span>
+          <span id="q-id">ID: 1</span>
+        </div>
+
+        <div class="question-text"><span id="question-content"></span><span id="multi-badge"
+            class="badge-multiple hidden">Multiple Choice</span></div>
+
+        <div class="options-grid" id="options-container">
+          <!-- Options injected here -->
+        </div>
+
+        <div class="actions">
+          <button id="end-btn" class="btn-secondary"
+            style="margin-right:auto; border-color:var(--error); color:var(--error);" onclick="finishExam()">End
+            Exam</button>
+          <button id="check-btn" class="btn-primary">Check Answer</button>
+          <button id="next-btn" class="btn-primary hidden">Next Question &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Result Interface -->
+      <div id="result-ui" class="quiz-card result-container hidden">
+        <h2>Exam Completed!</h2>
+        <p class="text-muted" style="margin-bottom:2rem;">Great job completing the practice session.</p>
+
+        <div class="score-circle" id="final-score">85%</div>
+
+        <div class="actions" style="justify-content: center;">
+          <button onclick="location.reload()" class="btn-primary">Restart Exam</button>
+        </div>
+
+        <div class="report-list" id="report-container">
+          <!-- Report items -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // State
+    const state = {
+      allQuestions: [], // Loaded from JSON
+      questions: [],    // Active subset
+      currentIndex: 0,
+      score: 0,
+      userAnswers: [],
+      timer: 0,
+      interval: null,
+      selectedCount: null
+    };
+
+    // DOM Elements
+    const els = {
+      loading: document.getElementById('loading'),
+      setupUi: document.getElementById('setup-ui'),
+      quizUi: document.getElementById('quiz-ui'),
+      resultUi: document.getElementById('result-ui'),
+      questionContent: document.getElementById('question-content'),
+      multiBadge: document.getElementById('multi-badge'),
+      optionsContainer: document.getElementById('options-container'),
+      qCurrent: document.getElementById('q-current'),
+      qTotal: document.getElementById('q-total'),
+      qId: document.getElementById('q-id'),
+      checkBtn: document.getElementById('check-btn'),
+      nextBtn: document.getElementById('next-btn'),
+      bar: document.getElementById('progress-bar'),
+      timer: document.getElementById('timer-text'),
+      scoreText: document.getElementById('score-text'),
+      progressText: document.getElementById('progress-text'),
+      finalScore: document.getElementById('final-score'),
+      report: document.getElementById('report-container'),
+      startBtn: document.getElementById('start-btn'),
+      customInput: document.getElementById('custom-input'),
+      randomCheck: document.getElementById('random-check')
+    };
+
+    // Init Logic
+    async function init() {
+      try {
+        const res = await fetch('questions.json');
+        state.allQuestions = await res.json();
+
+        // Filter out bad data
+        state.allQuestions = state.allQuestions.filter(q => q.question && Object.keys(q.choices).length > 0);
+
+        if (state.allQuestions.length === 0) {
+          els.loading.textContent = "No valid questions found.";
+          return;
+        }
+
+        // Update input max
+        els.customInput.max = state.allQuestions.length;
+
+        els.loading.classList.add('hidden');
+        els.setupUi.classList.remove('hidden');
+
+      } catch (e) {
+        els.loading.textContent = "Error loading questions: " + e.message;
+      }
+    }
+
+    // Setup Functions
+    function selectCount(count) {
+      state.selectedCount = count;
+      els.customInput.value = ''; // clear custom
+      updateStartBtn();
+    }
+
+    function handleCustomInput(val) {
+      // Clear preset selection
+      state.selectedCount = null;
+      updateStartBtn();
+    }
+
+    function updateStartBtn() {
+      const customVal = parseInt(els.customInput.value);
+      let count = state.selectedCount || customVal;
+
+      // Highlight logic
+      document.querySelectorAll('.setup-card').forEach(c => c.classList.remove('selected'));
+      if (state.selectedCount === 10) document.querySelectorAll('.setup-card')[0].classList.add('selected');
+      if (state.selectedCount === 25) document.querySelectorAll('.setup-card')[1].classList.add('selected');
+      if (state.selectedCount === 50) document.querySelectorAll('.setup-card')[2].classList.add('selected');
+      if (state.selectedCount === 'all') document.querySelectorAll('.setup-card')[3].classList.add('selected');
+
+      if (count && (count === 'all' || count > 0)) {
+        els.startBtn.disabled = false;
+        if (count === 'all') {
+          els.startBtn.textContent = `Start Full Exam (${state.allQuestions.length} Qs)`;
+        } else {
+          if (count > state.allQuestions.length) count = state.allQuestions.length;
+          els.startBtn.textContent = `Start ${count} Questions`;
+        }
+      } else {
+        els.startBtn.disabled = true;
+        els.startBtn.textContent = "Start Exam";
+      }
+    }
+
+    function startExam() {
+      // Get final count
+      const customVal = parseInt(els.customInput.value);
+      let count = state.selectedCount || customVal;
+      if (count === 'all' || count > state.allQuestions.length) count = state.allQuestions.length;
+
+      const isRandom = els.randomCheck.checked;
+
+      // Logic:
+      // If Random: Shuffle ALL, then take top N
+      // If Sequential: Take top N from ALL (which is sorted by ID presumably or initial read order)
+
+      let pool = [...state.allQuestions];
+
+      if (isRandom) {
+        pool.sort(() => 0.5 - Math.random());
+      }
+
+      state.questions = pool.slice(0, count);
+
+      els.setupUi.classList.add('hidden');
+      els.quizUi.classList.remove('hidden');
+
+      updateStats();
+      startTimer();
+      renderQuestion();
+    }
+
+    function startTimer() {
+      state.interval = setInterval(() => {
+        state.timer++;
+        const m = Math.floor(state.timer / 60).toString().padStart(2, '0');
+        const s = (state.timer % 60).toString().padStart(2, '0');
+        els.timer.textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    let currentSelectedKeys = [];
+
+    function renderQuestion() {
+      const q = state.questions[state.currentIndex];
+      const isMulti = q.answer.length > 1; // "AD", "BE" etc.
+      currentSelectedKeys = [];
+
+      // Update Headers
+      els.qCurrent.textContent = state.currentIndex + 1;
+      els.qTotal.textContent = state.questions.length;
+      els.qId.textContent = `ID: ${q.id}`;
+      els.questionContent.textContent = q.question;
+
+      if (isMulti) {
+        els.multiBadge.classList.remove('hidden');
+        els.multiBadge.textContent = 'Multiple select';
+      } else {
+        els.multiBadge.classList.add('hidden');
+      }
+
+      const pct = ((state.currentIndex) / state.questions.length) * 100;
+      els.bar.style.width = `${pct}%`;
+
+      // Reset UI
+      els.optionsContainer.innerHTML = '';
+      els.checkBtn.classList.remove('hidden');
+      els.checkBtn.disabled = true;
+      els.nextBtn.classList.add('hidden');
+
+      // Render Options
+      const keys = Object.keys(q.choices).sort();
+      keys.forEach(key => {
+        const div = document.createElement('div');
+        div.className = 'option';
+        div.onclick = () => selectOption(key, div, isMulti);
+
+        // determine circle or square shape
+        const shapeStyle = isMulti ? 'border-radius:4px;' : 'border-radius:50%;';
+
+        div.innerHTML = `
+          <div class="option-radio-wrapper">
+             <div style="font-weight:700; color:var(--primary); margin-right:10px; border:1px solid var(--border-color); width:24px; height:24px; display:flex; align-items:center; justify-content:center; ${shapeStyle}">${key}</div>
+          </div>
+          <div>${q.choices[key]}</div>
+        `;
+        div.dataset.key = key; // store for easy access
+        els.optionsContainer.appendChild(div);
+      });
+    }
+
+    function selectOption(key, el, isMulti) {
+      if (els.checkBtn.classList.contains('hidden')) return; // Already answered
+
+      if (isMulti) {
+        // Toggle
+        if (currentSelectedKeys.includes(key)) {
+          currentSelectedKeys = currentSelectedKeys.filter(k => k !== key);
+          el.classList.remove('selected');
+        } else {
+          currentSelectedKeys.push(key);
+          el.classList.add('selected');
+        }
+      } else {
+        // Single select
+        document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        currentSelectedKeys = [key];
+      }
+
+      els.checkBtn.disabled = currentSelectedKeys.length === 0;
+    }
+
+    els.checkBtn.onclick = () => {
+      const q = state.questions[state.currentIndex];
+      const correctOrig = q.answer; // "AB" or "C"
+
+      // Normalize comparison (sort letters)
+      const userStr = currentSelectedKeys.sort().join('');
+      const correctStr = correctOrig.split('').sort().join('');
+
+      const isCorrect = (userStr === correctStr);
+
+      // Highlight UI
+      Array.from(els.optionsContainer.children).forEach(div => {
+        const key = div.dataset.key;
+        div.classList.add('disabled');
+        div.onclick = null;
+
+        // If this key is part of the correct answer, green
+        if (correctStr.includes(key)) {
+          div.classList.add('correct');
+        }
+
+        // If user selected this key
+        if (currentSelectedKeys.includes(key)) {
+          // If NOT part of correct answer, mark wrong
+          if (!correctStr.includes(key)) {
+            div.classList.add('wrong');
+          }
+        }
+      });
+
+      if (isCorrect) state.score++;
+      state.userAnswers.push({ q, selected: userStr, correct: correctOrig });
+
+      updateStats();
+
+      els.checkBtn.classList.add('hidden');
+      els.nextBtn.classList.remove('hidden');
+    };
+
+    els.nextBtn.onclick = () => {
+      state.currentIndex++;
+      if (state.currentIndex >= state.questions.length) {
+        finishExam();
+      } else {
+        renderQuestion();
+      }
+    };
+
+    function updateStats() {
+      els.progressText.textContent = `${state.currentIndex}/${state.questions.length}`;
+      const pct = Math.round((state.score / (state.currentIndex || 1)) * 100);
+      els.scoreText.textContent = state.currentIndex > 0 ? `${pct}%` : '0%';
+    }
+
+    function finishExam() {
+      clearInterval(state.interval);
+      els.quizUi.classList.add('hidden');
+      els.resultUi.classList.remove('hidden');
+
+      const finalPct = Math.round((state.score / state.questions.length) * 100);
+      els.finalScore.textContent = `${finalPct}%`;
+
+      // Generate Report
+      let html = '';
+      state.userAnswers.forEach((item, i) => {
+        // Compare sorted logic again just in case
+        const userStr = item.selected.split('').sort().join('');
+        const correctStr = item.correct.split('').sort().join('');
+        const isCorrect = userStr === correctStr;
+
+        html += `
+          <div class="report-item ${isCorrect ? 'correct' : 'wrong'}">
+            <div style="font-weight:700; margin-bottom:0.5rem;">Question ${i + 1}</div>
+            <div style="margin-bottom:0.5rem;">${item.q.question}</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">
+              Your Answer: <span>${item.selected}</span> 
+              ${!isCorrect ? `| Correct: <span style="color:var(--success)">${item.correct}</span>` : ''}
+            </div>
+          </div>
+        `;
+      });
+      els.report.innerHTML = html;
+    }
+
+    // Expose selectCount to global scope for onclick attributes
+    window.selectCount = selectCount;
+    window.startExam = startExam;
+    window.handleCustomInput = handleCustomInput;
+
+    init();
+  </script>
+</body>
+
+</html>
